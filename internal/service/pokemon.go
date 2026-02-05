@@ -10,6 +10,11 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	// MaxLimit is the maximum number of Pokemon that can be requested at once
+	MaxLimit = 100
+)
+
 // PokemonService implements the domain.PokemonService interface
 type PokemonService struct {
 	client domain.PokemonClient
@@ -55,4 +60,50 @@ func (s *PokemonService) GetByName(ctx context.Context, nameOrID string) (*domai
 	)
 
 	return pokemon, nil
+}
+
+// List retrieves a paginated list of Pokemon
+func (s *PokemonService) List(ctx context.Context, limit, offset int) (*domain.PokemonList, error) {
+	// Validate limit
+	if limit <= 0 {
+		s.logger.Debug("Invalid limit", zap.Int("limit", limit))
+		return nil, domain.ErrInvalidLimit
+	}
+
+	if limit > MaxLimit {
+		s.logger.Debug("Limit exceeds maximum",
+			zap.Int("limit", limit),
+			zap.Int("max_limit", MaxLimit),
+		)
+		return nil, domain.ErrInvalidLimit
+	}
+
+	// Validate offset
+	if offset < 0 {
+		s.logger.Debug("Invalid offset", zap.Int("offset", offset))
+		return nil, domain.ErrInvalidOffset
+	}
+
+	s.logger.Info("Listing Pokemon",
+		zap.Int("limit", limit),
+		zap.Int("offset", offset),
+	)
+
+	// Fetch Pokemon list from client
+	pokemonList, err := s.client.FetchPokemonList(ctx, limit, offset)
+	if err != nil {
+		s.logger.Error("Failed to list Pokemon",
+			zap.Int("limit", limit),
+			zap.Int("offset", offset),
+			zap.Error(err),
+		)
+		return nil, err
+	}
+
+	s.logger.Info("Successfully retrieved Pokemon list",
+		zap.Int("count", pokemonList.Count),
+		zap.Int("results", len(pokemonList.Results)),
+	)
+
+	return pokemonList, nil
 }

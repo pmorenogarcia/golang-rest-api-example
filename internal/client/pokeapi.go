@@ -68,6 +68,34 @@ func (c *PokeAPIClient) FetchPokemon(ctx context.Context, nameOrID string) (*dom
 	return &pokemon, nil
 }
 
+// FetchPokemonList fetches a list of Pokemon from the PokeAPI
+func (c *PokeAPIClient) FetchPokemonList(ctx context.Context, limit, offset int) (*domain.PokemonList, error) {
+	url := fmt.Sprintf("%s/pokemon?limit=%d&offset=%d", c.baseURL, limit, offset)
+
+	c.logger.Debug("Fetching Pokemon list",
+		zap.Int("limit", limit),
+		zap.Int("offset", offset),
+		zap.String("url", url),
+	)
+
+	var pokemonList domain.PokemonList
+	if err := c.doRequestWithRetry(ctx, url, &pokemonList); err != nil {
+		c.logger.Error("Failed to fetch Pokemon list",
+			zap.Int("limit", limit),
+			zap.Int("offset", offset),
+			zap.Error(err),
+		)
+		return nil, fmt.Errorf("%w: %v", domain.ErrExternalAPI, err)
+	}
+
+	c.logger.Info("Successfully fetched Pokemon list",
+		zap.Int("count", pokemonList.Count),
+		zap.Int("results", len(pokemonList.Results)),
+	)
+
+	return &pokemonList, nil
+}
+
 // doRequestWithRetry performs an HTTP request with retry logic
 func (c *PokeAPIClient) doRequestWithRetry(ctx context.Context, url string, result interface{}) error {
 	var lastErr error

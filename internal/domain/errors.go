@@ -12,4 +12,9 @@ var (
 	// ErrExternalAPI is returned when the external API fails
 	ErrExternalAPI = errors.New("external API error")
 
+	// ErrInvalidLimit is returned when the limit parameter is invalid
+	ErrInvalidLimit = errors.New("invalid limit: must be between 1 and 100")
+
+	// ErrInvalidOffset is returned when the offset parameter is invalid
+	ErrInvalidOffset = errors.New("invalid offset: must be non-negative")
 )
