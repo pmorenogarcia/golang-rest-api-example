@@ -196,6 +196,57 @@
 					"response": []
 				},
 				{
+					"name": "Get Pokemon Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/count",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"count"
+							]
+						},
+						"description": "Get the total count of Pokemon available in the PokeAPI. Useful for pagination and UI display."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/count",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"count"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"count\": 1302\n}"
+						}
+					]
+				},
+				{
 					"name": "Pokemon Not Found (404)",
 					"request": {
 						"method": "GET",
