@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strings"
 
 	"github.com/polgarcia/golang-rest-api/internal/domain"
@@ -53,6 +54,24 @@ func (s *PokemonService) GetByName(ctx context.Context, nameOrID string) (*domai
 		zap.String("name", pokemon.Name),
 		zap.Int("id", pokemon.ID),
 	)
+
+	return pokemon, nil
+}
+
+// GetRandom retrieves a random Pokemon
+func (s *PokemonService) GetRandom(ctx context.Context) (*domain.Pokemon, error) {
+	// Generate random ID between 1 and 1000
+	// Note: Using math/rand without proper seeding
+	randomID := rand.Intn(1000) + 1
+
+	s.logger.Info("Getting random Pokemon", zap.Int("id", randomID))
+
+	// Fetch Pokemon by ID
+	pokemon, err := s.client.FetchPokemon(ctx, fmt.Sprintf("%d", randomID))
+	if err != nil {
+		// Missing detailed error logging
+		return nil, err
+	}
 
 	return pokemon, nil
 }

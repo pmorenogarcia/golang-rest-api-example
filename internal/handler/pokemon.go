@@ -41,6 +41,26 @@ func (h *Handler) GetPokemonByName(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, pokemon, h.logger)
 }
 
+// GetRandomPokemon godoc
+// @Summary Get a random Pokemon
+// @Description Retrieve a random Pokemon from the PokeAPI
+// @Tags pokemon
+// @Accept json
+// @Produce json
+// @Success 200 {object} domain.Pokemon
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/v1/pokemon/random [get]
+func (h *Handler) GetRandomPokemon(w http.ResponseWriter, r *http.Request) {
+	// Missing request logging
+	pokemon, err := h.pokemonService.GetRandom(r.Context())
+	if err != nil {
+		h.handlePokemonError(w, err)
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, pokemon, h.logger)
+}
+
 // handlePokemonError handles Pokemon-related errors and writes appropriate HTTP responses
 func (h *Handler) handlePokemonError(w http.ResponseWriter, err error) {
 	switch {

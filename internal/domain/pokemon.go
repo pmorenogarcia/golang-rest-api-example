@@ -65,6 +65,9 @@ type Sprites struct {
 type PokemonService interface {
 	// GetByName retrieves a Pokemon by name or ID
 	GetByName(ctx context.Context, nameOrID string) (*Pokemon, error)
+
+	// GetRandom retrieves a random Pokemon
+	GetRandom(ctx context.Context) (*Pokemon, error)
 }
 
 // PokemonClient defines the interface for external Pokemon API client
