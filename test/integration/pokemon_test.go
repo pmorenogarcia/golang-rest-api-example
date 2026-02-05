@@ -116,81 +116,6 @@ func TestGetPokemonByName(t *testing.T) {
 	}
 }
 
-func TestListPokemon(t *testing.T) {
-	router := setupTestServer(t)
-
-	tests := []struct {
-		name           string
-		queryParams    string
-		expectedStatus int
-		checkResponse  func(t *testing.T, list *domain.PokemonList)
-	}{
-		{
-			name:           "List default (no params)",
-			queryParams:    "",
-			expectedStatus: http.StatusOK,
-			checkResponse: func(t *testing.T, list *domain.PokemonList) {
-				assert.Greater(t, list.Count, 0)
-				assert.NotEmpty(t, list.Results)
-				assert.LessOrEqual(t, len(list.Results), 20) // default limit
-			},
-		},
-		{
-			name:           "List with custom limit",
-			queryParams:    "?limit=5&offset=0",
-			expectedStatus: http.StatusOK,
-			checkResponse: func(t *testing.T, list *domain.PokemonList) {
-				assert.Len(t, list.Results, 5)
-			},
-		},
-		{
-			name:           "List with pagination",
-			queryParams:    "?limit=10&offset=10",
-			expectedStatus: http.StatusOK,
-			checkResponse: func(t *testing.T, list *domain.PokemonList) {
-				assert.LessOrEqual(t, len(list.Results), 10)
-			},
-		},
-		{
-			name:           "Invalid limit (too high)",
-			queryParams:    "?limit=200",
-			expectedStatus: http.StatusBadRequest,
-			checkResponse:  nil,
-		},
-		{
-			name:           "Invalid limit (negative)",
-			queryParams:    "?limit=-1",
-			expectedStatus: http.StatusBadRequest,
-			checkResponse:  nil,
-		},
-		{
-			name:           "Invalid offset (negative)",
-			queryParams:    "?offset=-1",
-			expectedStatus: http.StatusBadRequest,
-			checkResponse:  nil,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, "/api/v1/pokemon"+tt.queryParams, nil)
-			w := httptest.NewRecorder()
-
-			router.ServeHTTP(w, req)
-
-			assert.Equal(t, tt.expectedStatus, w.Code)
-
-			if tt.checkResponse != nil && w.Code == http.StatusOK {
-				var list domain.PokemonList
-				err := json.NewDecoder(w.Body).Decode(&list)
-				require.NoError(t, err)
-
-				tt.checkResponse(t, &list)
-			}
-		})
-	}
-}
-
 func TestCORSHeaders(t *testing.T) {
 	router := setupTestServer(t)
 
@@ -232,17 +157,3 @@ func BenchmarkGetPokemon(b *testing.B) {
 	}
 }
 
-func BenchmarkListPokemon(b *testing.B) {
-	log, _ := logger.New("error", "console")
-	pokemonClient := client.NewPokeAPIClient("https://pokeapi.co/api/v2", 30000000000, log)
-	pokemonService := service.NewPokemonService(pokemonClient, log)
-	h := handler.NewHandler(pokemonService, log)
-	router := server.SetupRoutes(h, log, "*")
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/pokemon?limit=20&offset=0", nil)
-		w := httptest.NewRecorder()
-		router.ServeHTTP(w, req)
-	}
-}

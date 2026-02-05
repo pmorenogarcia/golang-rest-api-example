@@ -61,34 +61,14 @@ type Sprites struct {
 	BackShiny    string `json:"back_shiny"`
 }
 
-// PokemonList represents a paginated list of Pokemon
-type PokemonList struct {
-	Count    int              `json:"count"`
-	Next     *string          `json:"next"`
-	Previous *string          `json:"previous"`
-	Results  []PokemonSummary `json:"results"`
-}
-
-// PokemonSummary represents a summary of a Pokemon (used in lists)
-type PokemonSummary struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-}
-
 // PokemonService defines the interface for Pokemon business logic
 type PokemonService interface {
 	// GetByName retrieves a Pokemon by name or ID
 	GetByName(ctx context.Context, nameOrID string) (*Pokemon, error)
-
-	// List retrieves a paginated list of Pokemon
-	List(ctx context.Context, limit, offset int) (*PokemonList, error)
 }
 
 // PokemonClient defines the interface for external Pokemon API client
 type PokemonClient interface {
 	// FetchPokemon fetches a Pokemon from the external API
 	FetchPokemon(ctx context.Context, nameOrID string) (*Pokemon, error)
-
-	// FetchPokemonList fetches a list of Pokemon from the external API
-	FetchPokemonList(ctx context.Context, limit, offset int) (*PokemonList, error)
 }
