@@ -116,6 +116,45 @@ func TestGetPokemonByName(t *testing.T) {
 	}
 }
 
+func TestGetPokemonCount(t *testing.T) {
+	router := setupTestServer(t)
+
+	tests := []struct {
+		name           string
+		expectedStatus int
+		checkResponse  func(t *testing.T, count *domain.PokemonCount)
+	}{
+		{
+			name:           "Get Pokemon count successfully",
+			expectedStatus: http.StatusOK,
+			checkResponse: func(t *testing.T, count *domain.PokemonCount) {
+				assert.Greater(t, count.Count, 0, "Count should be greater than 0")
+				// PokeAPI has over 1000 Pokemon
+				assert.Greater(t, count.Count, 1000, "Should have more than 1000 Pokemon")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/pokemon/count", nil)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			if tt.checkResponse != nil && w.Code == http.StatusOK {
+				var count domain.PokemonCount
+				err := json.NewDecoder(w.Body).Decode(&count)
+				require.NoError(t, err)
+
+				tt.checkResponse(t, &count)
+			}
+		})
+	}
+}
+
 func TestCORSHeaders(t *testing.T) {
 	router := setupTestServer(t)
 

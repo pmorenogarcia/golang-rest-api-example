@@ -18,8 +18,9 @@ Currently, this API does not require authentication. All endpoints are publicly 
 2. [List Pokemon](#list-pokemon)
 3. [Get Pokemon by Name](#get-pokemon-by-name)
 4. [Get Pokemon by ID](#get-pokemon-by-id)
-5. [Error Responses](#error-responses)
-6. [Rate Limiting](#rate-limiting)
+5. [Get Pokemon Count](#get-pokemon-count)
+6. [Error Responses](#error-responses)
+7. [Rate Limiting](#rate-limiting)
 
 ---
 
@@ -274,6 +275,88 @@ curl http://localhost:8080/api/v1/pokemon/151
 #### Get Rayquaza (ID: 384)
 ```bash
 curl http://localhost:8080/api/v1/pokemon/384
+```
+
+---
+
+## Get Pokemon Count
+
+Get the total number of Pokemon available in the PokeAPI.
+
+### Request
+
+```bash
+curl -X GET http://localhost:8080/api/v1/pokemon/count
+```
+
+### Response
+
+```json
+{
+  "count": 1302
+}
+```
+
+**Status Code**: `200 OK`
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `count` | integer | Total number of Pokemon available |
+
+### Use Cases
+
+This endpoint is useful for:
+- Displaying total Pokemon count in your UI
+- Validating Pokemon IDs before making requests
+- Implementing pagination (knowing total pages)
+- Analytics and statistics
+
+### Example Integration
+
+#### JavaScript/Node.js
+```javascript
+async function getPokemonCount() {
+  const response = await fetch('http://localhost:8080/api/v1/pokemon/count');
+  const data = await response.json();
+  console.log(`Total Pokemon: ${data.count}`);
+  return data.count;
+}
+```
+
+#### Python
+```python
+import requests
+
+def get_pokemon_count():
+    response = requests.get('http://localhost:8080/api/v1/pokemon/count')
+    response.raise_for_status()
+    data = response.json()
+    print(f"Total Pokemon: {data['count']}")
+    return data['count']
+```
+
+#### Go
+```go
+type PokemonCount struct {
+    Count int `json:"count"`
+}
+
+func getPokemonCount() (int, error) {
+    resp, err := http.Get("http://localhost:8080/api/v1/pokemon/count")
+    if err != nil {
+        return 0, err
+    }
+    defer resp.Body.Close()
+
+    var count PokemonCount
+    if err := json.NewDecoder(resp.Body).Decode(&count); err != nil {
+        return 0, err
+    }
+
+    return count.Count, nil
+}
 ```
 
 ---

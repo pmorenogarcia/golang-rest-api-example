@@ -61,14 +61,25 @@ type Sprites struct {
 	BackShiny    string `json:"back_shiny"`
 }
 
+// PokemonCount represents the count of Pokemon
+type PokemonCount struct {
+	Count int `json:"count"`
+}
+
 // PokemonService defines the interface for Pokemon business logic
 type PokemonService interface {
 	// GetByName retrieves a Pokemon by name or ID
 	GetByName(ctx context.Context, nameOrID string) (*Pokemon, error)
+
+	// GetCount retrieves the total count of Pokemon
+	GetCount(ctx context.Context) (*PokemonCount, error)
 }
 
 // PokemonClient defines the interface for external Pokemon API client
 type PokemonClient interface {
 	// FetchPokemon fetches a Pokemon from the external API
 	FetchPokemon(ctx context.Context, nameOrID string) (*Pokemon, error)
+
+	// FetchPokemonCount fetches the total count from the external API
+	FetchPokemonCount(ctx context.Context) (int, error)
 }

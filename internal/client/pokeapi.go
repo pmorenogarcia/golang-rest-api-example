@@ -68,6 +68,21 @@ func (c *PokeAPIClient) FetchPokemon(ctx context.Context, nameOrID string) (*dom
 	return &pokemon, nil
 }
 
+// FetchPokemonCount fetches the total Pokemon count from the PokeAPI
+func (c *PokeAPIClient) FetchPokemonCount(ctx context.Context) (int, error) {
+	url := fmt.Sprintf("%s/pokemon?limit=1", c.baseURL)
+
+	var result struct {
+		Count int `json:"count"`
+	}
+
+	if err := c.doRequestWithRetry(ctx, url, &result); err != nil {
+		return 0, fmt.Errorf("%w: %v", domain.ErrExternalAPI, err)
+	}
+
+	return result.Count, nil
+}
+
 // doRequestWithRetry performs an HTTP request with retry logic
 func (c *PokeAPIClient) doRequestWithRetry(ctx context.Context, url string, result interface{}) error {
 	var lastErr error

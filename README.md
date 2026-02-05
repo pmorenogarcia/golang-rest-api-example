@@ -83,6 +83,12 @@ Get detailed information about a specific Pokemon.
 **Path Parameters:**
 - `nameOrId`: Pokemon name (e.g., "pikachu") or ID (e.g., "25")
 
+### Get Pokemon Count
+```
+GET /api/v1/pokemon/count
+```
+Get the total count of Pokemon available in the PokeAPI.
+
 ### Swagger UI
 ```
 GET /swagger/index.html
@@ -104,6 +110,11 @@ curl http://localhost:8080/api/v1/pokemon/25
 ### List first 10 Pokemon
 ```bash
 curl "http://localhost:8080/api/v1/pokemon?limit=10&offset=0"
+```
+
+### Get Pokemon Count
+```bash
+curl http://localhost:8080/api/v1/pokemon/count
 ```
 
 ### Health Check
