@@ -19,18 +19,19 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
-      issues: read
+      contents: read         # Read-only for code review
+      pull-requests: write   # Can comment on PRs
+      issues: write          # Can comment on issues
       id-token: write
-      actions: read # Required for Claude to read CI results on PRs
+      actions: read          # Can read CI results
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
-      # Set up Go environment for Claude to run tests and build
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -40,24 +41,22 @@ jobs:
       - name: Install Go dependencies
         run: go mod download
 
-      - name: Run Claude Code
+      - name: Run Claude Code Review
         id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
-          # This allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
 
-          # Configure Claude for Golang development
+          # Configure Claude for code review (READ-ONLY, no write access)
           claude_args: |
             --model claude-sonnet-4-5-20250929
-            --max-turns 15
-            --system-prompt "You are working on a Golang REST API project. Follow Go best practices and idiomatic patterns. Ensure proper error handling, use structured logging (zap), and maintain consistency with the existing codebase structure."
-            --allowedTools Bash(make test),Bash(make test-integration),Bash(make test-all),Bash(make lint),Bash(make fmt),Bash(make vet),Bash(make build),Bash(make coverage),Bash(make check),Bash(go test),Bash(go build),Bash(go vet),Bash(go fmt),Bash(go mod tidy),Bash(golangci-lint run)
+            --max-turns 20
+            --system-prompt "You are a Golang REST API code reviewer. Follow Go best practices and idiomatic patterns.\n\n## ACCESS RESTRICTIONS:\n**READ ACCESS: Entire repository**\n**WRITE ACCESS: NONE** (this workflow is for code review only)\n\n## Code Review Workflow:\n\nWhen reviewing PRs:\n\n1. Analyze code quality: Go best practices, error handling, test coverage, security, performance\n\n2. Check for endpoint changes in internal/server/routes.go and internal/handler/*.go\n\n3. If endpoint changes detected, include this section in your review:\n\n## Documentation Updates Needed\nThis PR adds/modifies/deletes API endpoints. Documentation should be updated.\n\n**Changed Endpoints:**\n[List each endpoint: METHOD /path - description]\n\n**Files to update:**\ndocs/postman/Pokemon_API.postman_collection.json\nREADME.md (if it contains API docs)\n\n**To update documentation, comment:** @claude-update-docs\n\n4. CRITICAL RULES:\n- NEVER commit any files during code review\n- NEVER update documentation yourself\n- ONLY mention that docs need updating\n- ONLY tell user to use @claude-update-docs command\n- The @claude-update-docs command triggers a separate secure workflow\n\n## Review Guidelines:\nBe constructive and specific, provide code examples, check for missing tests, verify error handling, flag security concerns, point out performance issues, ensure consistent logging with zap, verify clean architecture.\n\n## What NOT to do:\nDo NOT commit or push changes. Do NOT update documentation files. Do NOT use git add/commit/push commands. Do NOT modify any files. Your role is to REVIEW and ADVISE only."
+            --allowedTools Bash(make test),Bash(make test-integration),Bash(make test-all),Bash(make lint),Bash(make fmt),Bash(make vet),Bash(make build),Bash(make coverage),Bash(make check),Bash(go test),Bash(go build),Bash(go vet),Bash(golangci-lint run),Bash(git status),Bash(git diff)
 
-          # Environment variables for testing
           settings: |
             {
               "env": {
