@@ -1,0 +1,63 @@
+name: Mergeable Label Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled, reopened]
+
+jobs:
+  check-mergeable-label:
+    name: Check for Mergeable Label
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if mergeable label is present
+        id: check-label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(label => label.name);
+            const hasMergeableLabel = labels.includes('mergeable');
+
+            if (!hasMergeableLabel) {
+              core.setFailed('❌ PR requires "mergeable" label to be merged. Add the label after code review is complete.');
+            } else {
+              core.info('✅ PR has "mergeable" label and can be merged.');
+            }
+
+            return hasMergeableLabel;
+
+      - name: Post comment if label missing (first time)
+        if: failure() && github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number
+            });
+
+            const botComment = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('mergeable workflow')
+            );
+
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `## 🔒 Merge Requirements
+
+                This PR requires the following before it can be merged:
+
+                1. ✅ Code review from Claude (automatic)
+                2. ✅ All CI checks passing
+                3. ⏳ **\`mergeable\` label** (add this after review is complete)
+
+                Once all requirements are met, a maintainer should add the \`mergeable\` label to allow merging.
+
+                ---
+                *This is part of the mergeable workflow. See [CLAUDE_SETUP.md](../.github/CLAUDE_SETUP.md) for details.*`
+              });
+            }
