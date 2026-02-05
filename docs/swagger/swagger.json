@@ -1,0 +1,341 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Production-ready REST API for Pokemon data powered by PokeAPI",
+        "title": "Pokemon REST API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "https://github.com/polgarcia/golang-rest-api",
+            "email": "support@example.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/pokemon": {
+            "get": {
+                "description": "Get a paginated list of Pokemon",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pokemon"
+                ],
+                "summary": "List Pokemon",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Number of Pokemon to return (default: 20, max: 100)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Number of Pokemon to skip (default: 0)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonList"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pokemon/{nameOrId}": {
+            "get": {
+                "description": "Get detailed information about a Pokemon by name or ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pokemon"
+                ],
+                "summary": "Get Pokemon by name or ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pokemon name (e.g., 'pikachu') or ID (e.g., '25')",
+                        "name": "nameOrId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Pokemon"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Pokemon not found",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Check if the API is healthy and running",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_polgarcia_golang-rest-api_internal_domain.Ability": {
+            "type": "object",
+            "properties": {
+                "ability": {
+                    "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.AbilityInfo"
+                },
+                "is_hidden": {
+                    "type": "boolean"
+                },
+                "slot": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.AbilityInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.Pokemon": {
+            "type": "object",
+            "properties": {
+                "abilities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Ability"
+                    }
+                },
+                "base_experience": {
+                    "type": "integer"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sprites": {
+                    "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Sprites"
+                },
+                "stats": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Stat"
+                    }
+                },
+                "types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonType"
+                    }
+                },
+                "weight": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.PokemonList": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "next": {
+                    "type": "string"
+                },
+                "previous": {
+                    "type": "string"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonSummary"
+                    }
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.PokemonSummary": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.PokemonType": {
+            "type": "object",
+            "properties": {
+                "slot": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Type"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.Sprites": {
+            "type": "object",
+            "properties": {
+                "back_default": {
+                    "type": "string"
+                },
+                "back_shiny": {
+                    "type": "string"
+                },
+                "front_default": {
+                    "type": "string"
+                },
+                "front_shiny": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.Stat": {
+            "type": "object",
+            "properties": {
+                "base_stat": {
+                    "type": "integer"
+                },
+                "effort": {
+                    "type": "integer"
+                },
+                "stat": {
+                    "$ref": "#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.StatInfo"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.StatInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_polgarcia_golang-rest-api_internal_domain.Type": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_handler.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

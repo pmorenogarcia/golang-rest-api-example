@@ -1,0 +1,224 @@
+basePath: /
+definitions:
+  github_com_polgarcia_golang-rest-api_internal_domain.Ability:
+    properties:
+      ability:
+        $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.AbilityInfo'
+      is_hidden:
+        type: boolean
+      slot:
+        type: integer
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.AbilityInfo:
+    properties:
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.Pokemon:
+    properties:
+      abilities:
+        items:
+          $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Ability'
+        type: array
+      base_experience:
+        type: integer
+      height:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      sprites:
+        $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Sprites'
+      stats:
+        items:
+          $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Stat'
+        type: array
+      types:
+        items:
+          $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonType'
+        type: array
+      weight:
+        type: integer
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.PokemonList:
+    properties:
+      count:
+        type: integer
+      next:
+        type: string
+      previous:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonSummary'
+        type: array
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.PokemonSummary:
+    properties:
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.PokemonType:
+    properties:
+      slot:
+        type: integer
+      type:
+        $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Type'
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.Sprites:
+    properties:
+      back_default:
+        type: string
+      back_shiny:
+        type: string
+      front_default:
+        type: string
+      front_shiny:
+        type: string
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.Stat:
+    properties:
+      base_stat:
+        type: integer
+      effort:
+        type: integer
+      stat:
+        $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.StatInfo'
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.StatInfo:
+    properties:
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  github_com_polgarcia_golang-rest-api_internal_domain.Type:
+    properties:
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  internal_handler.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      request_id:
+        type: string
+    type: object
+  internal_handler.HealthResponse:
+    properties:
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: https://github.com/polgarcia/golang-rest-api
+  description: Production-ready REST API for Pokemon data powered by PokeAPI
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Pokemon REST API
+  version: "1.0"
+paths:
+  /api/v1/pokemon:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of Pokemon
+      parameters:
+      - default: 20
+        description: 'Number of Pokemon to return (default: 20, max: 100)'
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: 'Number of Pokemon to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.PokemonList'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/internal_handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_handler.ErrorResponse'
+      summary: List Pokemon
+      tags:
+      - pokemon
+  /api/v1/pokemon/{nameOrId}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a Pokemon by name or ID
+      parameters:
+      - description: Pokemon name (e.g., 'pikachu') or ID (e.g., '25')
+        in: path
+        name: nameOrId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_polgarcia_golang-rest-api_internal_domain.Pokemon'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/internal_handler.ErrorResponse'
+        "404":
+          description: Pokemon not found
+          schema:
+            $ref: '#/definitions/internal_handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/internal_handler.ErrorResponse'
+      summary: Get Pokemon by name or ID
+      tags:
+      - pokemon
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Check if the API is healthy and running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handler.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+schemes:
+- http
+- https
+swagger: "2.0"

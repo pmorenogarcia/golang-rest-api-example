@@ -1,0 +1,516 @@
+{
+	"info": {
+		"_postman_id": "pokemon-api-collection",
+		"name": "Pokemon REST API",
+		"description": "Complete collection for testing the Pokemon REST API built with Go.\n\nThis API provides Pokemon data powered by PokeAPI with clean architecture, OpenAPI documentation, and production-ready features.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check if the API is healthy and running. Returns status and timestamp."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/health",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"status\": \"ok\",\n    \"timestamp\": \"2026-02-04T12:30:00Z\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Health check endpoints to verify API status"
+		},
+		{
+			"name": "Pokemon",
+			"item": [
+				{
+					"name": "Get Pokemon by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/pikachu",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"pikachu"
+							]
+						},
+						"description": "Get detailed information about a Pokemon by name. Names are case-insensitive."
+					},
+					"response": [
+						{
+							"name": "Success - Pikachu",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/pikachu",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"pikachu"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"id\": 25,\n    \"name\": \"pikachu\",\n    \"height\": 4,\n    \"weight\": 60,\n    \"base_experience\": 112,\n    \"types\": [\n        {\n            \"slot\": 1,\n            \"type\": {\n                \"name\": \"electric\",\n                \"url\": \"https://pokeapi.co/api/v2/type/13/\"\n            }\n        }\n    ],\n    \"abilities\": [\n        {\n            \"is_hidden\": false,\n            \"slot\": 1,\n            \"ability\": {\n                \"name\": \"static\",\n                \"url\": \"https://pokeapi.co/api/v2/ability/9/\"\n            }\n        }\n    ],\n    \"stats\": [],\n    \"sprites\": {\n        \"front_default\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png\",\n        \"front_shiny\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png\",\n        \"back_default\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png\",\n        \"back_shiny\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/25.png\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Pokemon by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/25",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"25"
+							]
+						},
+						"description": "Get detailed information about a Pokemon by ID. Example: 25 for Pikachu."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Charizard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/charizard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"charizard"
+							]
+						},
+						"description": "Get Charizard information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Mewtwo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/mewtwo",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"mewtwo"
+							]
+						},
+						"description": "Get Mewtwo information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bulbasaur (ID: 1)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"1"
+							]
+						},
+						"description": "Get the first Pokemon - Bulbasaur"
+					},
+					"response": []
+				},
+				{
+					"name": "Pokemon Not Found (404)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/nonexistent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"nonexistent"
+							]
+						},
+						"description": "Test 404 error response when Pokemon doesn't exist"
+					},
+					"response": [
+						{
+							"name": "Pokemon Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/nonexistent",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"nonexistent"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"Pokemon not found\",\n    \"code\": 404,\n    \"request_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List Pokemon (Default)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							]
+						},
+						"description": "List Pokemon with default pagination (limit: 20, offset: 0)"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"count\": 1302,\n    \"next\": \"https://pokeapi.co/api/v2/pokemon?offset=20&limit=20\",\n    \"previous\": null,\n    \"results\": [\n        {\n            \"name\": \"bulbasaur\",\n            \"url\": \"https://pokeapi.co/api/v2/pokemon/1/\"\n        },\n        {\n            \"name\": \"ivysaur\",\n            \"url\": \"https://pokeapi.co/api/v2/pokemon/2/\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "List Pokemon (Custom Limit)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon?limit=10&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of Pokemon to return (1-100)"
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Number of Pokemon to skip"
+								}
+							]
+						},
+						"description": "List first 10 Pokemon"
+					},
+					"response": []
+				},
+				{
+					"name": "List Pokemon (Page 2)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon?limit=20&offset=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of Pokemon to return"
+								},
+								{
+									"key": "offset",
+									"value": "20",
+									"description": "Skip first 20 Pokemon"
+								}
+							]
+						},
+						"description": "Get second page of Pokemon (offset by 20)"
+					},
+					"response": []
+				},
+				{
+					"name": "List Pokemon (First 5)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon?limit=5&offset=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Get just the first 5 Pokemon"
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Limit (400)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon?limit=200",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "200",
+									"description": "Exceeds max limit of 100"
+								}
+							]
+						},
+						"description": "Test validation error when limit exceeds maximum (100)"
+					},
+					"response": [
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon?limit=200",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "200"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Bad Request\",\n    \"message\": \"invalid limit: must be between 1 and 100\",\n    \"code\": 400,\n    \"request_id\": \"550e8400-e29b-41d4-a716-446655440001\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Negative Offset (400)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon?limit=10&offset=-1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "-1",
+									"description": "Invalid negative offset"
+								}
+							]
+						},
+						"description": "Test validation error when offset is negative"
+					},
+					"response": []
+				}
+			],
+			"description": "Pokemon data endpoints for fetching and listing Pokemon information"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
