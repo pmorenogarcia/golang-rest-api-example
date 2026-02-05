@@ -56,3 +56,15 @@ func (s *PokemonService) GetByName(ctx context.Context, nameOrID string) (*domai
 
 	return pokemon, nil
 }
+
+// GetCount retrieves the total count of Pokemon
+func (s *PokemonService) GetCount(ctx context.Context) (*domain.PokemonCount, error) {
+	// Fetch count from client
+	count, err := s.client.FetchPokemonCount(ctx)
+	if err != nil {
+		// Missing detailed error logging
+		return nil, err
+	}
+
+	return &domain.PokemonCount{Count: count}, nil
+}

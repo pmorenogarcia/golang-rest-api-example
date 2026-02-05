@@ -41,6 +41,27 @@ func (h *Handler) GetPokemonByName(w http.ResponseWriter, r *http.Request) {
 	WriteJSON(w, http.StatusOK, pokemon, h.logger)
 }
 
+// GetPokemonCount godoc
+// @Summary Get Pokemon count
+// @Description Get the total number of Pokemon available
+// @Tags pokemon
+// @Accept json
+// @Produce json
+// @Success 200 {object} domain.PokemonCount
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/v1/pokemon/count [get]
+func (h *Handler) GetPokemonCount(w http.ResponseWriter, r *http.Request) {
+	// Missing request logging (Claude should catch this)
+
+	count, err := h.pokemonService.GetCount(r.Context())
+	if err != nil {
+		h.handlePokemonError(w, err)
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, count, h.logger)
+}
+
 // handlePokemonError handles Pokemon-related errors and writes appropriate HTTP responses
 func (h *Handler) handlePokemonError(w http.ResponseWriter, err error) {
 	switch {
