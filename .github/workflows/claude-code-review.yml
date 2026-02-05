@@ -1,0 +1,119 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # Only run on Go file changes and related config files
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - ".github/workflows/**"
+
+jobs:
+  claude-review:
+    # Optional: Filter by PR author or skip WIP/draft PRs
+    if: |
+      !contains(github.event.pull_request.title, '[skip-review]') &&
+      !contains(github.event.pull_request.title, '[WIP]') &&
+      github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write  # Changed to write so Claude can comment on PRs
+      issues: write         # Changed to write for creating/updating comments
+      id-token: write
+      actions: read         # To read CI/test results
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for better code context
+
+      # Set up Go environment for running tests/linting
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.4'
+          cache: true
+
+      - name: Install Go dependencies
+        run: go mod download
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # Comprehensive Golang-specific review prompt
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Please review this Golang REST API pull request thoroughly. Focus on:
+
+            **Code Quality & Go Best Practices:**
+            - Idiomatic Go code (effective Go principles)
+            - Proper error handling (don't ignore errors, wrap with context)
+            - Use of interfaces and dependency injection
+            - Naming conventions (camelCase for private, PascalCase for exported)
+            - Package structure and organization
+
+            **API Design:**
+            - RESTful endpoint design and consistency
+            - Request/response models and validation
+            - HTTP status codes usage
+            - Middleware implementation (logging, CORS, recovery)
+            - Swagger/OpenAPI documentation accuracy
+
+            **Security:**
+            - Input validation and sanitization
+            - SQL injection prevention (if using database)
+            - Proper error messages (don't leak sensitive info)
+            - CORS configuration
+            - Authentication/authorization if applicable
+
+            **Performance:**
+            - Goroutine usage and potential race conditions
+            - Proper use of context for cancellation/timeouts
+            - HTTP client configuration and connection pooling
+            - Memory allocations and potential leaks
+
+            **Testing:**
+            - Unit test coverage for business logic
+            - Integration test coverage for API endpoints
+            - Test table-driven patterns
+            - Proper use of mocks/stubs
+            - Edge cases and error scenarios
+
+            **Code Structure (this project uses):**
+            - chi router for routing
+            - zap for structured logging
+            - viper for configuration
+            - Clean architecture pattern (handler -> service -> client layers)
+
+            Run `make lint` and `make test` if needed to verify code quality.
+            Be constructive, specific, and provide code examples when suggesting improvements.
+
+          # Configure Claude with Go-specific tools access
+          claude_args: |
+            --model claude-sonnet-4-5-20250929
+            --max-turns 20
+            --system-prompt "You are an expert Go developer reviewing code for a REST API project. Be thorough but constructive. Focus on maintainability, performance, and security."
+            --allowedTools Bash(make test),Bash(make test-integration),Bash(make lint),Bash(make fmt),Bash(make vet),Bash(make build),Bash(make coverage),Bash(go test ./...),Bash(go vet ./...),Bash(golangci-lint run)
+
+          # Use sticky comments to update the same comment on new pushes
+          use_sticky_comment: true
+
+          # Environment settings for Go
+          settings: |
+            {
+              "env": {
+                "GO_ENV": "test",
+                "CGO_ENABLED": "0"
+              }
+            }
