@@ -51,8 +51,6 @@ func (h *Handler) GetPokemonByName(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/pokemon/count [get]
 func (h *Handler) GetPokemonCount(w http.ResponseWriter, r *http.Request) {
-	// Missing request logging (Claude should catch this)
-
 	count, err := h.pokemonService.GetCount(r.Context())
 	if err != nil {
 		h.handlePokemonError(w, err)
@@ -60,6 +58,41 @@ func (h *Handler) GetPokemonCount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	WriteJSON(w, http.StatusOK, count, h.logger)
+}
+
+// ComparePokemon godoc
+// @Summary Compare two Pokemon
+// @Description Compare two Pokemon based on their types and determine which is stronger
+// @Tags pokemon
+// @Accept json
+// @Produce json
+// @Param pokemon1 query string true "First Pokemon name (e.g., 'pikachu')"
+// @Param pokemon2 query string true "Second Pokemon name (e.g., 'charizard')"
+// @Success 200 {object} domain.PokemonComparison
+// @Failure 400 {object} ErrorResponse "Invalid input"
+// @Failure 404 {object} ErrorResponse "Pokemon not found"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /api/v1/pokemon/compare [get]
+func (h *Handler) ComparePokemon(w http.ResponseWriter, r *http.Request) {
+	pokemon1 := r.URL.Query().Get("pokemon1")
+	pokemon2 := r.URL.Query().Get("pokemon2")
+
+	h.logger.Info("ComparePokemon request",
+		zap.String("pokemon1", pokemon1),
+		zap.String("pokemon2", pokemon2),
+		zap.String("method", r.Method),
+		zap.String("path", r.URL.Path),
+	)
+
+	// Compare Pokemon using service
+	comparison, err := h.pokemonService.ComparePokemon(r.Context(), pokemon1, pokemon2)
+	if err != nil {
+		h.handlePokemonError(w, err)
+		return
+	}
+
+	// Return success response
+	WriteJSON(w, http.StatusOK, comparison, h.logger)
 }
 
 // handlePokemonError handles Pokemon-related errors and writes appropriate HTTP responses

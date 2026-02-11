@@ -31,6 +31,7 @@ func SetupRoutes(h *handler.Handler, log *logger.Logger, corsOrigins string) *ch
 		// Pokemon endpoints
 		r.Route("/pokemon", func(r chi.Router) {
 			r.Get("/count", h.GetPokemonCount)
+			r.Get("/compare", h.ComparePokemon)
 			r.Get("/{nameOrId}", h.GetPokemonByName)
 		})
 	})
