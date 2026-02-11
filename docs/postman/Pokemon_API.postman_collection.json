@@ -247,6 +247,192 @@
 					]
 				},
 				{
+					"name": "Compare Two Pokemon",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=squirtle",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"pokemon",
+								"compare"
+							],
+							"query": [
+								{
+									"key": "pokemon1",
+									"value": "pikachu",
+									"description": "First Pokemon name"
+								},
+								{
+									"key": "pokemon2",
+									"value": "squirtle",
+									"description": "Second Pokemon name"
+								}
+							]
+						},
+						"description": "Compare two Pokemon based on type effectiveness. Returns which Pokemon has the advantage based on their types."
+					},
+					"response": [
+						{
+							"name": "Success - Type Advantage",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=squirtle",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"compare"
+									],
+									"query": [
+										{
+											"key": "pokemon1",
+											"value": "pikachu"
+										},
+										{
+											"key": "pokemon2",
+											"value": "squirtle"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"Pikachu is stronger than Squirtle because electric type beats water type\",\n    \"type_advantage\": \"electric beats water\",\n    \"winner\": {\n        \"id\": 25,\n        \"name\": \"pikachu\",\n        \"height\": 4,\n        \"weight\": 60,\n        \"base_experience\": 112,\n        \"types\": [\n            {\n                \"slot\": 1,\n                \"type\": {\n                    \"name\": \"electric\",\n                    \"url\": \"https://pokeapi.co/api/v2/type/13/\"\n                }\n            }\n        ],\n        \"abilities\": [],\n        \"stats\": [],\n        \"sprites\": {\n            \"front_default\": \"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png\",\n            \"front_shiny\": \"\",\n            \"back_default\": \"\",\n            \"back_shiny\": \"\"\n        }\n    },\n    \"pokemon1\": {\n        \"id\": 25,\n        \"name\": \"pikachu\",\n        \"height\": 4,\n        \"weight\": 60,\n        \"base_experience\": 112,\n        \"types\": [\n            {\n                \"slot\": 1,\n                \"type\": {\n                    \"name\": \"electric\",\n                    \"url\": \"https://pokeapi.co/api/v2/type/13/\"\n                }\n            }\n        ],\n        \"abilities\": [],\n        \"stats\": [],\n        \"sprites\": {}\n    },\n    \"pokemon2\": {\n        \"id\": 7,\n        \"name\": \"squirtle\",\n        \"height\": 5,\n        \"weight\": 90,\n        \"base_experience\": 63,\n        \"types\": [\n            {\n                \"slot\": 1,\n                \"type\": {\n                    \"name\": \"water\",\n                    \"url\": \"https://pokeapi.co/api/v2/type/11/\"\n                }\n            }\n        ],\n        \"abilities\": [],\n        \"stats\": [],\n        \"sprites\": {}\n    }\n}"
+						},
+						{
+							"name": "Success - Neutral Matchup",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=charmander",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"compare"
+									],
+									"query": [
+										{
+											"key": "pokemon1",
+											"value": "pikachu"
+										},
+										{
+											"key": "pokemon2",
+											"value": "charmander"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"message\": \"Neither Pikachu (electric) nor Charmander (fire) has a type advantage - it's a neutral matchup!\",\n    \"winner\": null,\n    \"pokemon1\": {},\n    \"pokemon2\": {}\n}"
+						},
+						{
+							"name": "Error - Missing Parameters",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/compare?pokemon1=pikachu",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"compare"
+									],
+									"query": [
+										{
+											"key": "pokemon1",
+											"value": "pikachu"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Bad Request\",\n    \"message\": \"both Pokemon names must be provided\",\n    \"code\": 400,\n    \"request_id\": \"550e8400-e29b-41d4-a716-446655440001\"\n}"
+						},
+						{
+							"name": "Error - Same Pokemon",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=pikachu",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"pokemon",
+										"compare"
+									],
+									"query": [
+										{
+											"key": "pokemon1",
+											"value": "pikachu"
+										},
+										{
+											"key": "pokemon2",
+											"value": "pikachu"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n    \"error\": \"Bad Request\",\n    \"message\": \"cannot compare a Pokemon with itself\",\n    \"code\": 400,\n    \"request_id\": \"550e8400-e29b-41d4-a716-446655440002\"\n}"
+						}
+					]
+				},
+				{
 					"name": "Pokemon Not Found (404)",
 					"request": {
 						"method": "GET",

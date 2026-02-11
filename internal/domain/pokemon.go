@@ -66,6 +66,15 @@ type PokemonCount struct {
 	Count int `json:"count"`
 }
 
+// PokemonComparison represents the result of comparing two Pokemon
+type PokemonComparison struct {
+	Message       string   `json:"message"`
+	TypeAdvantage string   `json:"type_advantage,omitempty"`
+	Winner        *Pokemon `json:"winner"`
+	Pokemon1      *Pokemon `json:"pokemon1"`
+	Pokemon2      *Pokemon `json:"pokemon2"`
+}
+
 // PokemonService defines the interface for Pokemon business logic
 type PokemonService interface {
 	// GetByName retrieves a Pokemon by name or ID
@@ -73,6 +82,9 @@ type PokemonService interface {
 
 	// GetCount retrieves the total count of Pokemon
 	GetCount(ctx context.Context) (*PokemonCount, error)
+
+	// ComparePokemon compares two Pokemon based on type effectiveness
+	ComparePokemon(ctx context.Context, name1, name2 string) (*PokemonComparison, error)
 }
 
 // PokemonClient defines the interface for external Pokemon API client

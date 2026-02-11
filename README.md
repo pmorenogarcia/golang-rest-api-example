@@ -89,6 +89,16 @@ GET /api/v1/pokemon/count
 ```
 Get the total count of Pokemon available in the PokeAPI.
 
+### Compare Two Pokemon
+```
+GET /api/v1/pokemon/compare?pokemon1={name1}&pokemon2={name2}
+```
+Compare two Pokemon based on type effectiveness to determine which one has the advantage.
+
+**Query Parameters:**
+- `pokemon1` (required): First Pokemon name (e.g., "pikachu")
+- `pokemon2` (required): Second Pokemon name (e.g., "squirtle")
+
 ### Swagger UI
 ```
 GET /swagger/index.html
@@ -115,6 +125,11 @@ curl "http://localhost:8080/api/v1/pokemon?limit=10&offset=0"
 ### Get Pokemon Count
 ```bash
 curl http://localhost:8080/api/v1/pokemon/count
+```
+
+### Compare Pokemon
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=squirtle"
 ```
 
 ### Health Check
