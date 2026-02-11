@@ -19,8 +19,9 @@ Currently, this API does not require authentication. All endpoints are publicly 
 3. [Get Pokemon by Name](#get-pokemon-by-name)
 4. [Get Pokemon by ID](#get-pokemon-by-id)
 5. [Get Pokemon Count](#get-pokemon-count)
-6. [Error Responses](#error-responses)
-7. [Rate Limiting](#rate-limiting)
+6. [Compare Two Pokemon](#compare-two-pokemon)
+7. [Error Responses](#error-responses)
+8. [Rate Limiting](#rate-limiting)
 
 ---
 
@@ -356,6 +357,418 @@ func getPokemonCount() (int, error) {
     }
 
     return count.Count, nil
+}
+```
+
+---
+
+## Compare Two Pokemon
+
+Compare two Pokemon based on their type effectiveness to determine which one has the advantage.
+
+### Request
+
+```bash
+curl -X GET "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=squirtle"
+```
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `pokemon1` | string | Yes | Name of the first Pokemon (case-insensitive) |
+| `pokemon2` | string | Yes | Name of the second Pokemon (case-insensitive) |
+
+### Response - Type Advantage
+
+When one Pokemon has a type advantage over the other:
+
+```json
+{
+  "message": "Pikachu is stronger than Squirtle because electric type beats water type",
+  "type_advantage": "electric beats water",
+  "winner": {
+    "id": 25,
+    "name": "pikachu",
+    "height": 4,
+    "weight": 60,
+    "base_experience": 112,
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "electric",
+          "url": "https://pokeapi.co/api/v2/type/13/"
+        }
+      }
+    ],
+    "abilities": [],
+    "stats": [],
+    "sprites": {
+      "front_default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+      "front_shiny": "",
+      "back_default": "",
+      "back_shiny": ""
+    }
+  },
+  "pokemon1": {
+    "id": 25,
+    "name": "pikachu",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "electric",
+          "url": "https://pokeapi.co/api/v2/type/13/"
+        }
+      }
+    ]
+  },
+  "pokemon2": {
+    "id": 7,
+    "name": "squirtle",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "water",
+          "url": "https://pokeapi.co/api/v2/type/11/"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Status Code**: `200 OK`
+
+### Response - Neutral Matchup
+
+When neither Pokemon has a type advantage:
+
+```json
+{
+  "message": "Neither Pikachu (electric) nor Charmander (fire) has a type advantage - it's a neutral matchup!",
+  "winner": null,
+  "pokemon1": {
+    "id": 25,
+    "name": "pikachu",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "electric",
+          "url": "https://pokeapi.co/api/v2/type/13/"
+        }
+      }
+    ]
+  },
+  "pokemon2": {
+    "id": 4,
+    "name": "charmander",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "fire",
+          "url": "https://pokeapi.co/api/v2/type/10/"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Status Code**: `200 OK`
+
+### Response - Mutual Advantage (Tie)
+
+When both Pokemon have type advantages against each other:
+
+```json
+{
+  "message": "Charizard and Golem both have type advantages against each other - it's a tie!",
+  "type_advantage": "flying beats ground, but rock beats fire",
+  "winner": null,
+  "pokemon1": {
+    "id": 6,
+    "name": "charizard",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "fire",
+          "url": "https://pokeapi.co/api/v2/type/10/"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "flying",
+          "url": "https://pokeapi.co/api/v2/type/3/"
+        }
+      }
+    ]
+  },
+  "pokemon2": {
+    "id": 76,
+    "name": "golem",
+    "types": [
+      {
+        "slot": 1,
+        "type": {
+          "name": "rock",
+          "url": "https://pokeapi.co/api/v2/type/6/"
+        }
+      },
+      {
+        "slot": 2,
+        "type": {
+          "name": "ground",
+          "url": "https://pokeapi.co/api/v2/type/5/"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Status Code**: `200 OK`
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Human-readable description of the comparison result |
+| `type_advantage` | string | Description of which type beats which (optional, only when advantage exists) |
+| `winner` | object/null | Full Pokemon object of the winner, or `null` if tie/neutral |
+| `pokemon1` | object | Full Pokemon object for the first Pokemon |
+| `pokemon2` | object | Full Pokemon object for the second Pokemon |
+
+### Comparison Examples
+
+#### Electric vs Water (Type Advantage)
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=squirtle"
+# Result: Pikachu wins (electric beats water)
+```
+
+#### Fire vs Water (Type Advantage)
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=charmander&pokemon2=squirtle"
+# Result: Squirtle wins (water beats fire)
+```
+
+#### Grass vs Fire (Type Advantage)
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=bulbasaur&pokemon2=charmander"
+# Result: Charmander wins (fire beats grass)
+```
+
+#### Electric vs Fire (Neutral)
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=charmander"
+# Result: Neutral matchup (no type advantage)
+```
+
+#### Names are case-insensitive
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=PIKACHU&pokemon2=SQUIRTLE"
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=PiKaChU&pokemon2=sQuIrTlE"
+```
+
+### Type Effectiveness Rules
+
+The comparison is based on Pokemon type effectiveness:
+
+**Super Effective Matchups:**
+- Water beats Fire, Ground, Rock
+- Fire beats Grass, Ice, Bug, Steel
+- Grass beats Water, Ground, Rock
+- Electric beats Water, Flying
+- Ground beats Electric, Fire, Poison, Rock, Steel
+- Rock beats Fire, Ice, Flying, Bug
+- Ice beats Grass, Ground, Flying, Dragon
+- Fighting beats Normal, Ice, Rock, Dark, Steel
+- Poison beats Grass, Fairy
+- Flying beats Grass, Fighting, Bug
+- Psychic beats Fighting, Poison
+- Bug beats Grass, Psychic, Dark
+- Ghost beats Psychic, Ghost
+- Dragon beats Dragon
+- Dark beats Psychic, Ghost
+- Steel beats Ice, Rock, Fairy
+- Fairy beats Fighting, Dragon, Dark
+
+### Error Cases
+
+#### Missing Parameters
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu"
+```
+
+```json
+{
+  "error": "Bad Request",
+  "message": "both Pokemon names must be provided",
+  "code": 400,
+  "request_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+#### Same Pokemon
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=pikachu"
+```
+
+```json
+{
+  "error": "Bad Request",
+  "message": "cannot compare a Pokemon with itself",
+  "code": 400,
+  "request_id": "550e8400-e29b-41d4-a716-446655440001"
+}
+```
+
+#### Pokemon Not Found
+```bash
+curl "http://localhost:8080/api/v1/pokemon/compare?pokemon1=pikachu&pokemon2=nonexistent"
+```
+
+```json
+{
+  "error": "Not Found",
+  "message": "Pokemon not found",
+  "code": 404,
+  "request_id": "550e8400-e29b-41d4-a716-446655440002"
+}
+```
+
+### Use Cases
+
+This endpoint is useful for:
+- Building Pokemon battle simulators
+- Creating type matchup calculators
+- Educational tools for learning type effectiveness
+- Game strategy planning
+- Pokemon team composition analysis
+
+### Example Integration
+
+#### JavaScript/Node.js
+```javascript
+async function comparePokemon(pokemon1, pokemon2) {
+  const url = `http://localhost:8080/api/v1/pokemon/compare?pokemon1=${pokemon1}&pokemon2=${pokemon2}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  console.log(data.message);
+
+  if (data.winner) {
+    console.log(`Winner: ${data.winner.name}`);
+  } else {
+    console.log('No clear winner!');
+  }
+
+  return data;
+}
+
+// Usage
+comparePokemon('pikachu', 'squirtle')
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+#### Python
+```python
+import requests
+
+def compare_pokemon(pokemon1, pokemon2):
+    url = f'http://localhost:8080/api/v1/pokemon/compare'
+    params = {'pokemon1': pokemon1, 'pokemon2': pokemon2}
+
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+
+    data = response.json()
+    print(data['message'])
+
+    if data.get('winner'):
+        print(f"Winner: {data['winner']['name']}")
+    else:
+        print('No clear winner!')
+
+    return data
+
+# Usage
+try:
+    result = compare_pokemon('pikachu', 'squirtle')
+    print(result)
+except requests.exceptions.HTTPError as e:
+    print(f'Error: {e}')
+```
+
+#### Go
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "net/url"
+)
+
+type ComparisonResult struct {
+    Message       string   `json:"message"`
+    TypeAdvantage string   `json:"type_advantage,omitempty"`
+    Winner        *Pokemon `json:"winner"`
+    Pokemon1      *Pokemon `json:"pokemon1"`
+    Pokemon2      *Pokemon `json:"pokemon2"`
+}
+
+func comparePokemon(pokemon1, pokemon2 string) (*ComparisonResult, error) {
+    baseURL := "http://localhost:8080/api/v1/pokemon/compare"
+    params := url.Values{}
+    params.Add("pokemon1", pokemon1)
+    params.Add("pokemon2", pokemon2)
+
+    fullURL := fmt.Sprintf("%s?%s", baseURL, params.Encode())
+
+    resp, err := http.Get(fullURL)
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return nil, fmt.Errorf("HTTP error: %d", resp.StatusCode)
+    }
+
+    var result ComparisonResult
+    if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+        return nil, err
+    }
+
+    return &result, nil
+}
+
+// Usage
+func main() {
+    result, err := comparePokemon("pikachu", "squirtle")
+    if err != nil {
+        fmt.Printf("Error: %v\n", err)
+        return
+    }
+
+    fmt.Println(result.Message)
+    if result.Winner != nil {
+        fmt.Printf("Winner: %s\n", result.Winner.Name)
+    }
 }
 ```
 
